@@ -32,6 +32,7 @@ Python Dependencies
 •	matplotlib.colors
 
 •	SciPy
+
 •	Datetime
 
 •	request
