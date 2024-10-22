@@ -1,0 +1,51 @@
+#%%
+import pandas as pd
+import requests
+import hvplot.pandas
+import holoviews as hv
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+import numpy as np
+from geoapify_key import geoapify_key
+
+#%%
+suppliers_df = pd.read_csv("question 1,4,5.csv") 
+print(suppliers_df.columns)
+
+country_material = suppliers_df['SUPPLIER_COUNTRY_CODE'].value_counts().reset_index()
+country_material.columns = ['SUPPLIER_COUNTRY_CODE', 'material_count']
+#%%
+lat_lngs = []
+
+#%%
+def get_country_coords(country_code):
+    url = f"https://api.geoapify.com/v1/geocode/search?text={country_code}&apiKey={geoapify_key}"
+    response = requests.get(url).json()
+    if 'features' in response and len(response['features']) > 0:
+        coordinates = response['features'][0]['geometry']['coordinates']
+        country_name = response['features'][0]['properties'].get('country', 'Unknown')
+        return coordinates[1], coordinates[0], country_name
+    return None, None, None
+
+#%%
+for index, row in country_material.iterrows():
+    lat, lng, country_name = get_country_coords(row['SUPPLIER_COUNTRY_CODE'])
+    if lat and lng:
+        lat_lngs.append((lat, lng, row['material_count'], country_name))
+
+#%%
+lat_lng_df = pd.DataFrame(lat_lngs, columns=['lat', 'lon', 'material_count', 'country'])
+print(lat_lng_df.head())
+
+countries = lat_lng_df['country'].unique()
+colors = plt.cm.jet(np.linspace(0, 1, len(countries)))
+color_map = dict(zip(countries, [mcolors.to_hex(colors[idx]) for idx in range(len(countries))]))
+lat_lng_df['color'] = lat_lng_df['country'].map(color_map)
+
+#%%
+map_plot = lat_lng_df.hvplot.points(
+    'lon', 'lat', size='material_count', geo=True, tiles='OSM', color='color', alpha=0.7, hover_cols=['material_count', 'country']
+).opts(width=1500, height=900, title='Supplier Locations on Map')
+
+#%%
+map_plot
