@@ -1,11 +1,15 @@
 
 Nissan Manufacturing Final Analysis
 
+
 •	All the raw data can be found in the Main branch in the ‘Data’ folder.
 
 •	Each person worked on a few questions and their scripts cyphering through the data can be found within each of their won branches.
 
+
+
 Major Findings
+
 
 •	After analyzing user performance, we discovered that most users fall within ±0.5 standard deviations from the mean task time, with a few notable outliers on the lower end of the graph.
 
@@ -19,6 +23,8 @@ where we see the largest concentration of orders. Notably, Japan, the birthplace
 
 
 Python Dependencies
+
+
 •	Pandas
 
 •	Matplotlib.pyplot
